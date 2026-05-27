@@ -1,0 +1,216 @@
+
+package views;
+
+import models.Purchases;
+import dao.PurchasesDao;
+import java.awt.Graphics;
+import java.awt.PrintJob;
+import java.awt.Toolkit;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
+import javax.swing.table.DefaultTableModel;
+import models.PurchaseDetail;
+
+public class Print extends javax.swing.JFrame {
+
+
+    private final PurchasesDao purchaseDao = new PurchasesDao();
+    private DefaultTableModel model = new DefaultTableModel();
+
+
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Print.class.getName());
+
+    public Print(int id, Purchases purchaseSelected) {
+        initComponents();
+                // Hace que la barra de título use el estilo moderno de FlatLaf
+        javax.swing.JFrame.setDefaultLookAndFeelDecorated(true);
+        setLocationRelativeTo(null);
+        setResizable(false);
+        setTitle("Factura de Compra");
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                // Muestra el ID de la boleta en la esquina superior derecha
+        txt_print_invoice.setText(String.valueOf(id));
+        
+       
+        listAllPurchaseDetails(id, purchaseSelected);
+        calculatePurchase();
+
+    }
+
+  
+    public void listAllPurchaseDetails(int id, Purchases purchaseSelected) {
+        List<PurchaseDetail> list = purchaseDao.listPurchaseDetailQuery(id);
+        model = (DefaultTableModel) tb_print_purchases_detail.getModel();
+        model.setRowCount(0); 
+
+      
+        for (PurchaseDetail det : list) {
+            Object[] row = new Object[7];
+            row[0] = det.getProductName();   
+            row[1] = det.getQuantity(); 
+            row[2] = det.getPrice();       
+            row[3] = det.getSubtotal();            
+            row[4] = purchaseSelected.getSupplierName();     
+            row[5] = purchaseSelected.getEmployeeName();     
+            row[6] = purchaseSelected.getCreated();          
+            model.addRow(row);
+        }
+        tb_print_purchases_detail.setModel(model);
+    }
+    public void calculatePurchase() {
+        double total = 0;
+        int numRow = tb_print_purchases_detail.getRowCount();
+        
+        
+        for (int i = 0; i < numRow; i++) {
+            Object value = tb_print_purchases_detail.getValueAt(i, 3);
+         if (value != null && !String.valueOf(value).equalsIgnoreCase("null") && !String.valueOf(value).trim().isEmpty()) {
+            try {
+                total = total + Double.parseDouble(String.valueOf(value));
+            } catch (NumberFormatException e) {
+                System.out.println("Error al convertir fila " + i + ": " + e.getMessage());
+            }
+        }
+    }
+        txt_print_total.setText("" + total);
+    }
+
+  
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        form_print = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        txt_print_invoice = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tb_print_purchases_detail = new javax.swing.JTable();
+        jLabel4 = new javax.swing.JLabel();
+        txt_print_total = new javax.swing.JTextField();
+        btn_print_purchase = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        form_print.setBackground(new java.awt.Color(152, 202, 63));
+        form_print.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/user.png"))); // NOI18N
+        jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 100, 70));
+
+        form_print.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 100, 70));
+
+        jPanel1.setBackground(new java.awt.Color(18, 45, 61));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setText("Farmacia de la muerte");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 20, -1, -1));
+
+        txt_print_invoice.setEditable(false);
+        txt_print_invoice.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jPanel1.add(txt_print_invoice, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 20, 110, 25));
+
+        form_print.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 620, 70));
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("Detalles de la Compra");
+        form_print.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, -1, -1));
+
+        tb_print_purchases_detail.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Producto", "Cantidad", "Precio", "Subtotal", "Proveedor", "Comprado por", "Fecha"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(tb_print_purchases_detail);
+        if (tb_print_purchases_detail.getColumnModel().getColumnCount() > 0) {
+            tb_print_purchases_detail.getColumnModel().getColumn(0).setMinWidth(100);
+            tb_print_purchases_detail.getColumnModel().getColumn(5).setMinWidth(110);
+            tb_print_purchases_detail.getColumnModel().getColumn(6).setMinWidth(80);
+        }
+
+        form_print.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, 600, 140));
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel4.setText("Total:");
+        form_print.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 370, -1, 30));
+
+        txt_print_total.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        txt_print_total.setToolTipText("");
+        form_print.add(txt_print_total, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 370, 150, -1));
+
+        getContentPane().add(form_print, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 620, 520));
+
+        btn_print_purchase.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btn_print_purchase.setText("Imprimir");
+        btn_print_purchase.addActionListener(this::btn_print_purchaseActionPerformed);
+        getContentPane().add(btn_print_purchase, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 560, -1, -1));
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void btn_print_purchaseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_print_purchaseActionPerformed
+try {
+            Toolkit tk = this.getToolkit();
+            
+          
+            PrintJob pj = tk.getPrintJob(this, "Factura de Compra - " + txt_print_invoice.getText(), null);
+            
+           
+            if (pj == null) {
+                return; 
+            }
+            
+            Graphics graphics = pj.getGraphics();
+            
+            if (graphics != null) {
+                form_print.print(graphics); 
+                graphics.dispose();        
+                pj.end();                
+            }
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                "No se pudo conectar con la impresora física: " + e.getMessage(), 
+                "Error de Impresión", JOptionPane.ERROR_MESSAGE);
+        }
+
+    }//GEN-LAST:event_btn_print_purchaseActionPerformed
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.JButton btn_print_purchase;
+    private javax.swing.JPanel form_print;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    public javax.swing.JTable tb_print_purchases_detail;
+    public javax.swing.JTextField txt_print_invoice;
+    public javax.swing.JTextField txt_print_total;
+    // End of variables declaration//GEN-END:variables
+}
